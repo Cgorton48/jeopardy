@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Juliet Jeopardy</title>
+
+    <link rel="canonical" href="/play/html5css3-jeopardy" />
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="animate.css">
+
+    <script src="jquery.js"></script>
+
+    <!-- <base href="https://jeopardylabs.com" /> -->
+
+    <script>
+    window.resizeiframe = function(){
+        $('#myiframe').each(function(){
+            if($(this).data("last-height") == this.height){
+                return;
+            }
+            this.height = this.contentWindow.document.body.scrollHeight+20;
+            $(this).data("last-height", this.height);
+        })
+    }
+
+    var lastWindowHeight = 0; 
+    var lastWindowWidth = 0; 
+
+    $(window).resize(function(e){
+        if(!e.originalEvent){
+
+        } else if($(window).height()!=lastWindowHeight || $(window).width()!=lastWindowWidth){
+            lastWindowHeight = $(window).height();
+            lastWindowWidth = $(window).width();
+        } else {
+            return;
+        }
+
+        if($(window).data("first-load") === undefined){
+            $('body').animate({opacity:1}, 500);
+        }
+
+        $('.table-row').each(function(){
+            $(this).css("display", "block");
+            var width = $(this).width();
+            var count = $(this).children().length
+            var cell_width = Math.floor(1.0*(width)/count)
+            $(this).children().css({
+                width: cell_width
+            });
+            $(this).css("display", "table");
+        });
+
+        var number_of_rows = $('#question-grid .table-row').length;
+
+        if($("#categories textarea").length == 0){
+// resize the category boxes;
+var min_font_size = 12;
+var max_font_size = 24;
+var height = $(window).height() / (number_of_rows + 1)
+var max_height = height;
+var new_max_height = 0;
+$("#categories .table-cell").css({ 
+    height: 1
+});
+$("#categories .table-cell-inner").each(function(){
+    var max_width = $(this).width()
+    var font_size = 24;
+
+    do {
+        $(this).css("font-size", font_size);
+        var w = this.scrollWidth 
+        var h = this.scrollHeight;
+        if(w <= max_width && h <= max_height){
+            new_max_height = Math.max(new_max_height, h);
+            break;
+        }
+        font_size--;
+    } while(font_size);
+});
+
+$("#categories .table-cell").css({ 
+    height: new_max_height
+});
+
+
+}
+
+var top = $('#question-grid').offset().top;
+var border_bottom_width = parseInt($('#question-grid .table-row:last-child').css("border-bottom-width"), 10)
+var bottom = $(window).height();
+
+if($("#teams:visible").length){
+    bottom = ($('#teams').offset().top)+((bottom-top-border_bottom_width)/Math.max(5, number_of_rows))/4;
+}
+
+var height_per_row = Math.floor((bottom-top-border_bottom_width)/Math.max(5, number_of_rows));
+$('#question-grid .table-cell').each(function(){
+    $(this).css("height", height_per_row);
+});
+
+window.resizeiframe();
+});
+
+$(document).ready(function(){
+    var teamPointsArray = [];
+    var totalEl = $('#question-grid .table-cell').length + 1;
+    var randNum = Math.floor(Math.random() * totalEl);
+
+// console.log(totalEl);
+console.log('DAILY DOUBLE: ' + randNum);
+
+$('[data-dailydouble]').each(function(i, obj) {
+// console.log(i);
+// console.log(i);
+if (i == randNum) {
+// console.log(this);
+$(this).attr('data-dailydouble', 'daily-double');
+}
+});
+
+$(window).resize();
+$('#add-row').click(function(){
+    if(!window.LOGGED_IN){
+        modal2.show();
+    } else {
+        if($('#question-grid').find(".table-row").length >= 15){
+            alert("You can't add another row. 15 is the max");
+            return
+        }
+        var row = $('#question-grid').find(".table-row:first-child").clone();
+        $('#question-grid').append(row);
+        var row_number = $('#question-grid .table-row').length
+        row.find("h3").text((row_number)*100)
+        row.find("textarea").val("");
+        row.find("textarea").each(function(){
+            var name = $(this).attr('name');
+            name = name.replace(/(.*)\[(\d+)\]\[(\d+)\]/, "$1[" + (row_number-1) + "][$3]")
+            $(this).attr("name", name);
+        });
+        row.find(".table-cell").addClass("empty");
+        $(window).resize();
+    }
+});
+
+$('#add-column').click(function(){
+    if(!window.LOGGED_IN){
+        modal2.show();
+    } else {
+        var row = $('#question-grid').find(".table-row").each(function(){
+            var clone = $(this).find(".table-cell:last-child").clone();
+            $(this).find(".table-cell:last-child").after(clone);
+            var col = $(this).find(".table-cell").length;
+            clone.find("textarea").val("");
+            clone.addClass("empty");
+            clone.find("textarea").each(function(){
+                var name = $(this).attr('name');
+                name = name.replace(/(.*)\[(\d+)\]\[(\d+)\]/, "$1[$2][" + (col - 1) + "]")
+                $(this).attr("name", name);
+            });
+
+        });
+// add the cateogry
+var clone = $('#categories').find(".table-cell:first-child").clone();
+$('#categories').find(".table-cell:last-child").after(clone);
+clone.find("textarea").val("Enter Category");
+clone.find("textarea").addClass("empty");
+var col = $('#categories .table-cell').length;
+clone.find("textarea").attr("name", "category[" + (col-1) + "]");
+
+$(window).resize();
+$(window).resize();
+}
+});
+
+$('#double-jeopardy').on('click', function(e) {
+    e.preventDefault();
+    $('body').addClass('doublejeopardy');
+    $('#question-grid .table-cell h3').css('opacity',1);
+    $('#double-jeopardy').css('display','none');
+
+    $('#categories .table-cell').each(function(){
+        var newCategory = $(this).find('h2').attr('data-title');
+
+        $(this).find('h2').text(newCategory);
+
+        $(this).removeAttr('data-dailydouble');
+    });
+
+    $('#question-grid .table-cell').each(function(){
+        var doubled = $(this).attr('data-points') * 2;
+
+        $(this).attr('data-points', doubled);
+        $(this).find('h3').text(doubled);
+
+        var newAnswer = $(this).find('.answer').attr('data-answer');
+        var newQuestion = $(this).find('.question').attr('data-question');
+        $(this).find('.answer').text(newAnswer);
+        $(this).find('.question').text(newQuestion);
+
+        $(this).removeAttr('data-dailydouble');
+    });
+
+    $('#suspenseful')[0].play();
+});
+
+});
+</script>
+
+<script>
+if(window.MathJax){
+    MathJax.Hub.Config({
+        asciimath2jax: {
+            delimiters: [['`', '`']],
+            skipTags: ["script","noscript","style","textarea","pre","code", "body"]
+        }
+    });
+}
+
+$(document).ready(function(){
+    if(window.MathJax){
+        $('.mathy').each(function(){
+            this.innerText = '`' + this.innerText + '`';
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,this]);
+        })
+    }
+});
+
+</script>
+
+<script>
+
+var modal = function(){}
+
+var game = {}
+try {
+    history.replaceState({"page": "menu"}, "JeopardyLabs")
+} catch (e) {}
+
+game.init = function(no_push_state){
+// $('#begin')[0].play();
+$('#thisisjeopardy')[0].play();
+var val = $('#options select').val();
+$('#options').hide();
+var teams = $('#teams .team');
+for(var i = 0; i < val; i++){
+    $(teams[i]).show();
+}
+$('#gameplay').css("filter", "blur(0px)");
+$(window).resize();
+if(!no_push_state){
+    try {
+        history.pushState({"page": "game"}, "JeopardyLabs");
+    } catch (e) {}
+}
+}
+
+window.onpopstate = function(event){
+    if(event.state.page == "menu"){
+        var teams = $('#teams .team');
+        teams.each(function(){ $(this).hide() })
+
+        $('#gameplay').css("filter", "blur(3px)");
+        $('#options').show();
+        modal.hide()
+        $(window).resize();
+        $("#submit").prop("value", "Continue")
+        $("#reset-all").show();
+    } else if(event.state.page == "game"){
+        game.init(true);
+    }
+}
+
+function doubleIt(points) {
+
+}
+
+function capSizes(el, max_width){
+    return
+    var treeWalker = document.createTreeWalker(el, NodeFilter.SHOW_ELEMENT, null, false);
+    while(treeWalker.nextNode()){
+        node = treeWalker.currentNode;
+        if(node.tagName == "IMG" && !node.complete){
+            node.style.maxWidth = "0";
+        } else {
+            try {
+                node.style.maxWidth = max_width + "px";
+            } catch (e) {
+
+            }
+        }
+    }
+
+}
+
+function trimHTML(el){
+    var treeWalker = document.createTreeWalker(el, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null, false);
+    while(treeWalker.nextNode()){
+        var node = treeWalker.currentNode;
+    }
+    var nodes_to_delete = [];
+    do {
+        var node = treeWalker.currentNode;
+        if(node.nodeType == 3 && $.trim(node.data) == ""){
+            nodes_to_delete.push(node);
+        } else if(node.tagName == "SCRIPT"){
+
+        } else if (node.tagName == "BR"){
+            nodes_to_delete.push(node);
+        } else if(node.tagName == "P" && $.trim($(node).text()) == ""){
+            nodes_to_delete.push(node);
+        } else {
+            break;
+        }
+    } while(treeWalker.previousNode())
+    for(var i = 0; i < nodes_to_delete.length; i++){
+        $(nodes_to_delete[i]).remove();
+    }
+
+}
+
+function calculateSize(el){
+    var max_width = Math.floor($(window).width() * .9);
+    var max_height = (($('#teams').offset().top || $(window).height()) - $(el).offset().top)/2.0;
+    var html = el.innerHTML
+    var text = $(el).text();
+
+    var div = document.createElement("div");
+    div.className = "answer-wrapper"
+//div.style.opacity = 0;
+div.style.display = "block";
+div.style.overflowX = "auto";
+div.style.position = "absolute";
+div.style.left = "0";
+div.style.top = "0";
+div.style.zIndex = 1000;
+//div.style.wordWrap = "break-word";
+div.style.width = max_width + "px";
+// first, scale the text
+div.innerText = text.replace(/\n/g, '');
+if(html.indexOf("mathy") != -1){
+//debugger;
+}
+
+var body = $('body').get(0);
+body.appendChild(div);
+font_size = 100; //getComputedStyle(div)['fontSize'])
+do {
+    div.style.fontSize = font_size + "px";
+//var bbox = div.getBoundingClientRect();
+var w = div.offsetWidth
+var h = div.offsetHeight;
+//w += div.scrollWidth - div.offsetWidth
+//var scale = Math.min(1, Math.min(1.0*max_width/w, 1.0*max_height/h));
+if(w <= max_width && h <= max_height){
+    break;
+}
+font_size--;
+} while(font_size);
+font_size = Math.max(font_size, 18);
+
+/*
+// now try to scale the rest of the stuff
+div.innerHTML = html;
+capSizes(div, max_width);
+
+div.style.overflowX = "initial";
+//div.style.width = "auto";
+var bbox = div.getBoundingClientRect();
+var w = bbox.width;
+var h = bbox.height;
+var scale = Math.min(1, Math.min(1.0*max_width/w, 1.0*max_height/h));
+
+capSizes(el, max_width);
+//el.style.transform = "translate(0%, -50%) scale(" + scale + ") ";
+el.style.transform = "scale(" + scale + ") ";
+*/
+div.parentNode.removeChild(div);
+el.style.fontSize = font_size + 'px';
+return font_size
+}
+
+
+modal.reveal = function(){
+    var q = $('#question-modal').find(".question")
+    q.css({
+        "display": "block",
+    });
+    function scrollTo(element, to, duration) {
+        var start = element.scrollTop,
+        change = to - start,
+        currentTime = 0,
+        increment = 20;
+
+        var animateScroll = function(){        
+            currentTime += increment;
+            var val = easeInOutQuad(currentTime, start, change, duration);
+            element.scrollTop = val;
+            if(currentTime < duration) {
+                setTimeout(animateScroll, increment);
+            }
+        };
+        animateScroll();
+    }
+
+//t = current time
+//b = start value
+//c = change in value
+//d = duration
+function easeInOutQuad(t, b, c, d){
+    t /= d/2;
+    if (t < 1) return c/2*t*t + b;
+    t--;
+    return -c/2 * (t*(t-2) - 1) + b;
+};
+
+var original_val = $('#question-modal .modal-inner').scrollTop()
+$('#question-modal .modal-inner').scrollTop(0)
+var val = $('#question-modal .question').offset().top - $('#question-modal .modal-inner').offset().top
+$('#question-modal .modal-inner').scrollTop(original_val)
+scrollTo($('#question-modal .modal-inner').get(0), val, 250)
+
+setTimeout(function(){
+    q.addClass("reveal");
+}, 0)
+
+$('.active-question h3').css({
+    "opacity": 0
+})
+}
+
+modal.show = function(cell){
+    $('.active-question').removeClass("active-question");
+    $(cell).addClass("active-question");
+    var position = $(cell).closest(".table-row").children().index(cell);
+    var category = $($("#categories .table-cell").get(position)).text();
+    var points = $(cell).attr("data-points");
+    var dailydouble = $(cell).attr("data-dailydouble");
+
+// console.log(dailydouble);
+
+if (dailydouble) {
+    $('#double')[0].play();
+}
+
+$('#question-title').text(category + " for " + points);
+var bbox = cell.getBoundingClientRect();
+$('#question-modal').css({
+    "display": "block",
+    "opacity": 0,
+})
+
+$('#question-modal .modal-inner').html(
+    $(cell).find(".answer").prop("outerHTML") +
+    $(cell).find(".question").prop("outerHTML")
+    )
+
+setTimeout(function(){
+    var q = $('#question-modal .answer')
+    try {
+        q.find("video, audio").get(0).play();
+    } catch (e) {
+
+    }
+
+    try {
+        var iframe = q.find("iframe")
+        var src = iframe.attr("src") || "";
+        var a = document.createElement("a");
+        a.href = src
+        if(a.hostname == "www.youtube.com"){
+            a.search = (a.search || "?") + '&autoplay=1'
+            iframe.prop('src', a.toString());
+        }
+    } catch (e) {
+// ?
+}
+}, 500);
+
+$('#question-modal .modal2').scrollTop(0)
+
+trimHTML($('#question-modal .answer').get(0))
+trimHTML($('#question-modal .question').get(0))
+
+var font_size = calculateSize($('#question-modal .modal-inner').get(0))
+
+var h = ($('#teams').offset().top || $(window).height()) - $('#question-modal .modal2').offset().top - 20;
+$('#question-modal .modal-inner').css({
+    maxHeight: h
+});
+$('#question-modal .modal2').css({
+    height: h
+})
+
+$('#question-modal').css({
+    transform: "translate(" + bbox.x + "px, " + bbox.y  + "px) scale(" + (bbox.width/$(window).width()) + ", " + (bbox.height / $(window).height()) + ")",
+    opacity: 1
+})
+
+$(window).on("keydown.question-modal", function(e){
+    var ESC = 27
+    var SPACE = 32
+    var ENTER = 13
+    var HAHA = 49
+    var BRINGITON = 50
+    var OH = 51
+    var WOW = 52
+    var YEAH = 53
+    var LAUGH = 54
+
+// console.log(e.keyCode);
+
+if(e.keyCode == ESC){
+    e.preventDefault();
+    modal.hide();
+    $('#think')[0].pause();
+    $('#think')[0].currentTime = 0;
+} else if(e.keyCode == SPACE){
+    e.preventDefault();
+    modal.reveal();
+} else if(e.keyCode == ENTER){
+    e.preventDefault();
+    $('#think')[0].play();
+} else if(e.keyCode == HAHA){
+    $('#haha')[0].play();
+} else if(e.keyCode == BRINGITON) {
+    $('#bringiton')[0].play();
+} else if(e.keyCode == OH) {
+    $('#ohhh')[0].play();
+} else if(e.keyCode == WOW) {
+    $('#wow')[0].play();
+} else if(e.keyCode == YEAH){
+    $('#yeah')[0].play();
+} else if(e.keyCode == LAUGH) {
+    $('#laugh')[0].play();
+}
+});
+
+$('.expanded').removeClass("expanded");
+
+setTimeout(function(){
+    if (dailydouble === 'daily-double') {
+        $('#question-modal').addClass('dailydouble');
+        $('.answer').prepend('<h2 class="dailydouble animated lightSpeedIn">DAILY DOUBLE</h2>');
+    } else {
+        $('#question-modal').removeClass('dailydouble');
+        $('.dailydouble').remove();
+    }
+    $('#question-modal').addClass("expanded");
+    $('#question-modal').css({
+        top:0,
+        left:0,
+        bottom:0,
+        right:0,
+        width: '100%',
+        height: '100%',
+        borderWidth:0,
+        transform: "translate(0px, 0px) scale(1)"
+    });
+}, 1);
+
+}
+
+modal.hide = function(){
+    $(window).off("keydown.question-modal");
+    $('#question-modal').hide();
+    $('#question-modal').removeClass("expanded");
+    $('#question-modal').css({
+        borderWidth:3
+    });
+    $('#question-modal .modal-inner').html("")
+}
+
+$(document).ready(function(){
+
+    $('#question-grid .table-cell:not(.empty) .table-cell-inner').mouseenter(function() {
+        $(this).find('h3').addClass('animated rubberBand');
+        $('#click')[0].play();
+    }).mouseleave(function() {
+        $(this).find('h3').removeClass('animated rubberBand');
+        $('#click')[0].currentTime = 0;
+    });
+
+    $('#question-modal').on("click", '#answer-button', function(){
+        modal.reveal();
+    })
+
+    $('#question-modal').on("click", '#continue-button', function(){
+        modal.hide();
+    });
+
+    $('#question-grid .table-cell:not(.empty)').on("click", function(){
+// figure out the point value of the thing that was clicked
+modal.show(this);
+});
+
+// prevent the buttons from being highlighted
+$('body').on("mousedown", ".minus, .plus", function(e){
+    e.preventDefault();
+});
+
+$('body').on("click", ".plus", function(e){
+    var $points = $(this).closest(".team").find(".points")
+    var points = parseInt($points.text())
+    var val = parseInt($(".active-question").attr("data-points") || 100);
+    var dailydouble = $(".active-question").attr("data-dailydouble");
+
+// console.log(dailydouble);
+
+if (dailydouble === 'daily-double') {
+    points += val * 2;
+} else {
+    points += val;
+}
+
+$points.text(points);
+
+$('.active-question h3').css({
+    "opacity": 0
+});
+
+$('#right')[0].play();
+});
+
+$('body').on("click", ".minus", function(e){
+    var $points = $(this).closest(".team").find(".points")
+    var points = parseInt($points.text())
+    var val = parseInt($(".active-question").attr("data-points") || 100);
+    var dailydouble = $(".active-question").attr("data-dailydouble");
+
+    if (dailydouble === 'daily-double') {
+        points -= val * 2;
+    } else {
+        points -= val;
+    }
+
+    $points.text(points);
+
+    $('.active-question h3').css({
+        "opacity": 0
+    });
+
+    $('#wrong')[0].play();
+});
+
+$(window).resize();
+
+});
+</script>
+
+</head>
+
+<body>
+
+    <div id="gameplay">
+        <div class="table-row" id="categories">
+            <div class="table-cell">
+                <div class="table-cell-inner"><h2 data-title="SOLDIER TASKS">PMCS</h2></div>
+            </div>
+            <div class="table-cell">
+                <div class="table-cell-inner"><h2 data-title="D &amp; C">AFATDS</h2></div>
+            </div>
+            <div class="table-cell">
+                <div class="table-cell-inner"><h2 data-title="ARMY REGS">DCOMMS</h2></div>
+            </div>
+            <div class="table-cell">
+                <div class="table-cell-inner"><h2 data-title="FIRE MISSION FIRE MISSION">RADIO</h2></div>
+            </div>
+            <div class="table-cell">
+                <div class="table-cell-inner"><h2 data-title="THAT'S 10 LEVEL">SOLDIER TASKS</h2></div>
+            </div>
+        </div>
+
+        <div id="question-grid">
+            <div class="table-row">
+                <div data-points="100" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>100</h3>
+                        <div class="answer" data-answer="An effective tool to help control severe blood loss from body's extremities.">This is the number of T130 track shoes on the left (dirvers side) of a M1068A3.</div>
+                        <div class="question" data-question="What is the Combat Application Tourniquet (CAT)?">What is 63?</div>
+                    </div>
+                </div>
+                <div data-points="100" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>100</h3>
+                        <div class="answer" data-answer="When changing direction of a march, this is the foot the cammand of execution is given on.">This function will help you test or verify your LAN connection.</div>
+                        <div class="question" data-question="What is the foot corresponding to direction of change?">What is a PING?</div>
+                    </div>
+                </div>
+                <div data-points="100" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>100</h3>
+                        <div class="answer" data-answer="This is the regulation for wear and appearance of army uniforms and insignia.">This is the data rate set on the radio for DCOMMS.</div>
+                        <div class="question" data-question="What is AR 670-1?">What is PACKET?</div>
+                    </div>
+                </div>
+                <div data-points="100" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>100</h3>
+                        <div class="answer" data-answer="The number of points required for a MPAM mission.">A SINCGARS radio set to medium power will have this range capability.</div>
+                        <div class="question" data-question="What is a minimum of two?">What is 400M - 5K?</div>
+                    </div>
+                </div>
+                <div data-points="100" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>100</h3>
+                        <div class="answer" data-answer="Checking to see if radio is on PKT and that all cables are properly connected are examples of troubleshooting this issue.">Which nostril is often preferred for Nasopharyngeal airway (NPA) insertion given that it is typically larger and straighter?</div>
+                        <div class="question" data-question="What is bad DCOMMS?"><img src="images/npa2.jpg">What is the right nostril?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-row">
+                <div data-points="200" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>200</h3>
+                        <div class="answer" data-answer="Represented by very close (or sometimes touching) contour lines.">This is the number of inspection periods in a year's time.</div>
+                        <div class="question" data-question="What is a cliff?">What is 6? (before, during, after, weekly, monthly, semi-annualy)</div>
+                    </div>
+                </div>
+                <div data-points="200" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>200</h3>
+                        <div class="answer" data-answer="Two part commands consist of a command of execution and this command.">This Operational Facility (OPFAC) system is a totally intergraded Fire Support C2 system.</div>
+                        <div class="question" data-question="What is the preparatory command?">What is a Advanced Field Artillery Tactical Data System (AFATDS)?</div>
+                    </div>
+                </div>
+                <div data-points="200" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>200</h3>
+                        <div class="answer" data-answer="Sideburns will not extend below this part of the ear.">This is the type of the cable that connects the DCOMMS radio to J5 port on the VAA.</div>
+                        <div class="question" data-question="What is the bottom of the opening of the ear?">What is a W4 cable?</div>
+                    </div>
+                </div>
+                <div data-points="200" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>200</h3>
+                        <div class="answer" data-answer="PK3518 is an example of one of these.">A SINCGARS radio has this many channels.</div>
+                        <div class="question" data-question="What is a Target Number?">What is 8? (1-6, CUE, MAN)</div>
+                    </div>
+                </div>
+                <div data-points="200" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>200</h3>
+                        <div class="answer" data-answer="May cause red gum balls under munitions tab.">These items are worn in MOPP 3.</div>
+                        <div class="question" data-question="What is the wrong munitions or no munitions?">What is: Mask, Garment &amp; Boots?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-row">
+                <div data-points="300" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>300</h3>
+                        <div class="answer" data-answer="Determined by adding or subtracting 3200 mils. A projection of the azimuth from the origin to the opposite side of the azimuth circle.">The object being pointed to is.<img src="images/pmcs1.jpg"></div>
+                        <div class="question" data-question="What is a back azimuth?">What is 'center guide'?</div>
+                    </div>
+                </div>
+                <div data-points="300" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>300</h3>
+                        <div class="answer" data-answer="This is one of the methods used to instruct drill and ceremony.">Modem card used with Afatds.</div>
+                        <div class="question" data-question="What is 'step by step' or 'by the numbers'?">What is a Tactical Communications Interface modem or module (TCIM)?</div>
+                    </div>
+                </div>
+                <div data-points="300" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>300</h3>
+                        <div class="answer" data-answer="This sexual assault report does NOT trigger an official investigation.">This is the port on the VAA you connect the dongle cable to.</div>
+                        <div class="question" data-question="What is restricted?">What is the J3 port?</div>
+                    </div>
+                </div>
+                <div data-points="300" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>300</h3>
+                        <div class="answer" data-answer="Counter Battery Radar is found in this target category.">This number key is pressed to change the data rate on a SINCGARS.</div>
+                        <div class="question" data-question="What is RSTA?">What is 4?</div>
+                    </div>
+                </div>
+                <div data-points="300" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>300</h3>
+                        <div class="answer" data-answer="Low transmission fluid or unsecured dipstick may cause this control panel light to be lit.">The square protractor uses these two scales.</div>
+                        <div class="question" data-question="What is the TRANS OIL LOW PRESS warning light?">What are degrees and mils?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-row">
+                <div data-points="400" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>400</h3>
+                        <div class="answer" data-answer="Detect liquid chemical agents by attaching this to your MOPP gear at the upper arm, wrist, and ankle.">This is the class of leak in which a drop forms, but does not drip or fall.</div>
+                        <div class="question" data-question="What is M9 detector paper?">What is a class 2?</div>
+                    </div>
+                </div>
+                <div data-points="400" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>400</h3>
+                        <div class="answer" data-answer="This is the steps per minute for 'Quick Time, March'.">The window that will allow you to "Import a Unit".</div>
+                        <div class="question" data-question="What is 120 steps/minute?">What is the Joint Master Unit List (JMUL)?</div>
+                    </div>
+                </div>
+                <div data-points="400" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>400</h3>
+                        <div class="answer" data-answer="This soldier is the only one authorized to wear the PT shirt outside the trunks.">To default the INC, this is the data rate the radio must first be set to.</div>
+                        <div class="question" data-question="What are pregnant females?">What is OFF?</div>
+                    </div>
+                </div>
+                <div data-points="400" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>400</h3>
+                        <div class="answer" data-answer="MPAM is short for this.">These are the steps to place a SINCGARS into whisper mode.</div>
+                        <div class="question" data-question="What is 'Multiple Precision-Aimpoint Mission'?">What is: (1) Press MENU, (2) Press Digit (1-9) for Vol Setting (0) for Whisper Mode?</div>
+                    </div>
+                </div>
+                <div data-points="400" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>400</h3>
+                        <div class="answer" data-answer="When replacing track shoes, the optimal place to break track is at this point?"><img src="images/soldiertasks1.jpg"></div>
+                        <div class="question" data-question="Between the last road wheel and the tensioner sprocket.">What is action left?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-row">
+                <div data-points="500" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>500</h3>
+                        <div class="answer" data-answer="(1) Flushed, hot, dry skin. (2) Headache. (3) Dizziness. (4) Nausea. (5) Confusion. (6) Weakness. (7) Loss of consciousness. (8) Seizures. (9) Weak and rapid pulse and breathing."><img src="images/pmcs2.jpg"></div>
+                        <div class="question" data-question="What are symptoms if heatstroke?">What is the 'air purifier switch'?</div>
+                    </div>
+                </div>
+                <div data-points="500" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>500</h3>
+                        <div class="answer" data-answer="This is the Prussian officer who wrote 'Regulations for the order and discipline of the troops of the United States', otherwise know as the Blue Book."><img src="images/afatds1.jpg">The number 343 above the red arrow represents this value.</div>
+                        <div class="question" data-question="Who is Friedrich Wilhelm von Steuben?">What is Height above ellipsoid?</div>
+                    </div>
+                </div>
+                <div data-points="500" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>500</h3>
+                        <div class="answer" data-answer="When properly bloused, the trousers should not extend below this part of the boot.">To ping the INC during troubleshooting, this must be added to the last octet.</div>
+                        <div class="question" data-question="What is the 3rd eyelet from the top?">What is 128?</div>
+                    </div>
+                </div>
+                <div data-points="500" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>500</h3>
+                        <div class="answer" data-answer="This application allows you to see the time of flight and max ord without sending the fire mission to the launcher.">This is what the acronym SINCGARS stands for.</div>
+                        <div class="question" data-question="What is the 'Munitions Calculator'?">What is 'Single Channel Ground and Airborne Radio System'?</div>
+                    </div>
+                </div>
+                <div data-points="500" data-dailydouble="" class="table-cell ">
+                    <div class="table-cell-inner">
+                        <h3>500</h3>
+                        <div class="answer" data-answer="Time is off, No COMSEC, bad hand mic.">The six lines used to ensure that potential intelligence information is reported.</div>
+                        <div class="question" data-question="What are reasons for degraded voice communications of SINCGARS?">What are: Size, Activity, Location, Unit, Time, and Equipment?<br>(SALUTE report)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="double-jeopardy">DOUBLE JEOPARDY</button>
+
+        <div id="teams">
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 1</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 2</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 3</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 4</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 5</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 6</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 7</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 8</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 9</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 10</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 11</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 12</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 13</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 14</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 15</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+
+            <div class="team" style="display:none">
+                <h3 class="name" contenteditable="true">Team 16</h3>
+                <h3 class="points" contenteditable="true">0</h3>
+                <div class="pointer">
+                    <span class="plus">+</span>
+                    <span class="minus">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="question-modal" class="modal-wrapper">
+            <div id="question-modal-table">
+                <div id="continue-button"><span>Continue <kbd>ESC</kbd></span></div>
+                <div id="question-title"></div>
+                <div id="answer-button"><span>Reveal Correct Response <kbd>Spacebar</kbd></span></div>
+            </div>
+            <div class="modal2">
+                <div class="modal-inner"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="options" class="modal-wrapper">
+        <div class="modal">
+            <h1 style="font-size:4rem;margin-bottom:.8em;color:#f5e51b;">Juliet Jeopardy</h1>
+            <select>
+                <option value="1">1 team</option>     
+                <option value="2">2 teams</option>
+                <option value="3">3 teams</option>
+                <option value="4">4 teams</option>
+                <option value="5">5 teams</option>
+                <option value="6">6 teams</option>
+                <option value="7">7 teams</option>
+                <option value="8">8 teams</option>
+                <option value="9">9 teams</option>
+                <option value="10">10 teams</option>  
+                <option value="11">11 teams</option>
+                <option value="12">12 teams</option>  
+                <option value="13">13 teams</option>  
+                <option value="14">14 teams</option>  
+                <option value="15">15 teams</option>  
+                <option value="16">16 teams</option>  
+            </select>
+            <input class="submit" type="button" id="submit" value="Start" onclick="game.init()" />
+            <div id="reset-all" style="display:none">
+                <a href="">Reset Scores</a>
+            </div>
+            <p id="fullscreen" style="margin-top:20px; display:none" align="center">Press <kbd id="windows" style="display:none">F11</kbd> <kbd id="mac" style="display:none">View &gt; Enter Fullscreen</kbd> for full-screen mode</p>
+            <script>
+            if(window.navigator.platform.indexOf("Mac") == 0){
+                $('#fullscreen, #mac').show();
+            } else if(window.navigator.platform.indexOf("Win") == 0){
+                $('#fullscreen, #windows').show();
+            }
+            </script>
+        </div>
+    </div>
+
+    <audio id="think"><source src="audio/think.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="begin"><source src="audio/begin.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="right"><source src="audio/rightanswer.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="wrong"><source src="audio/wronganswer.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="double"><source src="audio/jdaily2X.wav" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="haha"><source src="audio/haha.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="suspenseful"><source src="audio/suspenseful.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="thisisjeopardy"><source src="audio/thisisjeopardy.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="click"><source src="audio/click.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="wow"><source src="audio/wow.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="ohhh"><source src="audio/ohhhhh.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="bringiton"><source src="audio/bringiton.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="yeah"><source src="audio/yeah.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+    <audio id="laugh"><source src="audio/laugh.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+WebFont.load({
+    google: {
+        families: ['Allerta Stencil', 'sans-serif']
+    }
+});
+</script>
+</html>
