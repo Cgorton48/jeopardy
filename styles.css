@@ -484,6 +484,7 @@ input, textarea, select {
 #categories .table-cell-inner h2 {
   max-width: 300px;
   margin: 0 auto;
+  font-size: 1.8rem;
 }
 
 #question-grid .table-cell-inner h3 {
