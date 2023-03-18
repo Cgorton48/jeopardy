@@ -17,6 +17,37 @@ html {
   width: device-width;
 }
 
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,800);
+		
+@font-face {
+    font-family: 'brandon_textblack';
+    src: url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-black-webfont.woff2') format('woff2'),
+         url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-black-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'brandon_textbold';
+    src: url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-bold-webfont.woff2') format('woff2'),
+         url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-bold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'brandon_textlight';
+    src: url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-light-webfont.woff2') format('woff2'),
+         url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-light-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'brandon_text_regularregular';
+    src: url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-regular-webfont.woff2') format('woff2'),
+         url('https://assets.lswebdev.com/fonts/brandontext/hvd_fonts_-_brandontext-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block;
 }
@@ -43,7 +74,7 @@ hr {
 }
 
 h1, h2 {
-  font-family: 'Allerta Stencil', sans-serif;
+  font-family: brandon_textblack, Arial, sans-serif;
   font-weight: normal;
   line-height: 1em;
 }
@@ -340,22 +371,22 @@ template {
 }
 
 body {
-	background-color:darkgray;
+	background-color:#55565a;
 	height:100%;
-	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-family:brandon_text_regularregular, Arial, sans-serif;
     overflow-y:hidden;
 }
 
 body.doublejeopardy {
-  background-color: black;
+  background-color: #f36c21;
 }
 
 body.doublejeopardy #categories .table-cell {
-    color: #f5e51b;
+    color: #ffffff;
 }
 
 body.doublejeopardy #categories .table-cell {
-    border-right: 1px solid #f5e51b;
+    border-right: 1px solid #ffffff;
 }
 
 body.doublejeopardy #categories .table-cell:last-child {
@@ -363,7 +394,7 @@ body.doublejeopardy #categories .table-cell:last-child {
 }
 
 body.doublejeopardy #question-grid {
-  background-color:crimson;
+    background-image: linear-gradient(45deg,#55565a,black 90%);
 }
 
 body.doublejeopardy #categories h2:first-child {
@@ -383,7 +414,7 @@ body.doublejeopardy #teams h3.points {
 }
 
 body.doublejeopardy #question-grid .table-cell-inner {
-    border: 3px solid black;
+    border: 3px solid #f36c21;
 }
 
 * {
@@ -438,7 +469,7 @@ input, textarea, select {
 
 #question-grid {
   transition: background-color 2s ease;
-  background-color: darkolivegreen;
+  background-image: linear-gradient(-90deg,#faa545,#f36c21 68%);
     margin-top:5px;
     padding: 20px 0;
 }
@@ -466,7 +497,7 @@ input, textarea, select {
     transform: translateY(-50%);
     top: 50%;
     position: relative;
-    border: 3px solid black;
+    border: 3px solid white;
     width: 80%;
     margin: 0 auto;
     border-radius: 20px;
@@ -488,24 +519,25 @@ input, textarea, select {
 }
 
 #question-grid .table-cell-inner h3 {
+    font-family: brandon_textblack, Arial, sans-serif;
     font-size:36px;
 }
 
 #question-grid .table-cell:hover .table-cell-inner {
-    background-color:rgba(0,0,0, .3);
+    background-color:rgba(255,255,255, .5);
 }
 
 #question-grid .table-cell:hover .table-cell-inner,
 #question-grid .table-cell:focus .table-cell-inner,
 #question-grid .table-cell.active .table-cell-inner {
-    border-color:#f5e51b;
+    border-color:#55565a;
     border-style:solid;
 }
 
 #question-grid .table-cell:hover h3,
 #question-grid .table-cell:focus h3,
 #question-grid .table-cell.active h3 {
-    color: #f5e51b;
+    color: #f36c21;
 }
 
 #question-grid .table-cell:focus {
@@ -1062,7 +1094,7 @@ label {
     #categories .table-cell {
         font-size:24px;
         text-align:center;
-        color: black;
+        color: white;
     }
 
     #question-grid .table-cell {
@@ -1081,7 +1113,7 @@ label {
 
     #categories .table-cell {
         vertical-align:bottom;
-        border-right:1px solid black;
+        border-right:1px solid white;
     }
 
     #categories .table-cell:last-child {
@@ -1090,7 +1122,6 @@ label {
 
     #categories {
         margin:10px 0;
-        height: 60px;
     }
 
     #question-modal {
@@ -1098,12 +1129,12 @@ label {
     }
 
     #question-modal.dailydouble {
-      background-color: darkgoldenrod;
+      background-color: #55565a;
     }
 
     #question-modal.dailydouble h2.dailydouble {
       font-size: 1.5em;
-      color: #f5e51b;
+      color: #f36c21;
     }
 
     #question-modal > div {
@@ -1134,8 +1165,8 @@ label {
     }
 
     #question-modal {
-        background-color:darkolivegreen;	
-        border:3px solid #ffff00;;
+        background-color:#f36c21;	
+        border:3px solid #55565a;;
         z-index:10;
     }
 
