@@ -1249,7 +1249,7 @@ label {
         transition: max-height 2s ease, opacity 2s ease;
         opacity:1;
         display:block;
-        border-top: 3px dotted #f5e51b;
+        border-top: 3px dotted #55565a;
         margin-top: 10px;
         padding-top: 10px;
     }
