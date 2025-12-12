@@ -8,8 +8,260 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
     <link rel="stylesheet" type="text/css" href="animate.css">
     <script src="jquery.js"></script>
+    <script src="game-manager.js"></script>
 
     <script>
+// Global game state
+var currentGameData = null;
+var currentRound = 'single'; // 'single' or 'double'
+var gameProgress = null;
+
+// Load or initialize game data
+function loadGameData() {
+    const currentGameId = gameManager.getCurrentGameId();
+    
+    if (currentGameId) {
+        currentGameData = gameManager.loadGame(currentGameId);
+    }
+    
+    // If no game loaded, use default game
+    if (!currentGameData) {
+        // Try to load default game from JSON file
+        fetch('games/default-game.json')
+            .then(response => response.json())
+            .then(data => {
+                currentGameData = data;
+                const gameId = gameManager.saveGame(currentGameData);
+                gameManager.setCurrentGameId(gameId);
+                checkForSavedProgress();
+            })
+            .catch(err => {
+                console.error('Error loading default game:', err);
+                // Fallback to empty game
+                currentGameData = gameManager.createEmptyGame();
+                const gameId = gameManager.saveGame(currentGameData);
+                gameManager.setCurrentGameId(gameId);
+                checkForSavedProgress();
+            });
+        return;
+    }
+    
+    checkForSavedProgress();
+}
+
+// Check for saved progress and prompt user
+function checkForSavedProgress() {
+    const savedProgress = gameManager.loadProgress(currentGameData.id);
+    
+    if (savedProgress && savedProgress.answeredQuestions && savedProgress.answeredQuestions.length > 0) {
+        // Add Resume/New Game options to the start screen
+        $('#options .modal').prepend(`
+            <div class="progress-notification">
+                <h3>Saved Progress Found!</h3>
+                <p>Would you like to resume your previous game?</p>
+                <button class="submit" id="resumeGame">Resume Game</button>
+                <button class="submit" id="newGame">Start New Game</button>
+            </div>
+        `);
+        
+        $('#resumeGame').click(function() {
+            loadProgress(savedProgress);
+            $(this).parent().remove();
+            game.init();
+        });
+        
+        $('#newGame').click(function() {
+            gameManager.clearProgress(currentGameData.id);
+            $(this).parent().remove();
+            renderGameBoard();
+        });
+    } else {
+        renderGameBoard();
+    }
+}
+
+// Load progress into game
+function loadProgress(progress) {
+    gameProgress = progress;
+    currentRound = progress.round || 'single';
+    
+    renderGameBoard();
+    
+    // Restore team names and scores
+    if (progress.teams && progress.teams.length > 0) {
+        // Set the team selector to the correct number of teams
+        $('#teamSelect').val(progress.teams.length);
+        
+        // Show the correct number of teams
+        $('#teams .team').hide();
+        progress.teams.forEach((team, idx) => {
+            const teamEl = $('#teams .team').eq(idx);
+            teamEl.show();
+            teamEl.find('.name').text(team.name);
+            teamEl.find('.points').text(team.score);
+        });
+    }
+    
+    // Mark answered questions
+    if (progress.answeredQuestions) {
+        progress.answeredQuestions.forEach(qId => {
+            const parts = qId.split('-');
+            if (parts[0] === currentRound) {
+                const row = parseInt(parts[1]);
+                const col = parseInt(parts[2]);
+                const cell = $('#question-grid .table-row').eq(row).find('.table-cell').eq(col);
+                cell.find('h3').css('opacity', 0);
+            }
+        });
+    }
+    
+    // Handle double jeopardy state
+    if (currentRound === 'double') {
+        $('body').addClass('doublejeopardy');
+        $('#double-jeopardy').css('display', 'none');
+    }
+}
+
+// Save current progress
+function saveProgress() {
+    if (!currentGameData || !currentGameData.id) return;
+    
+    const teams = [];
+    $('#teams .team:visible').each(function() {
+        teams.push({
+            name: $(this).find('.name').text(),
+            score: parseInt($(this).find('.points').text()) || 0
+        });
+    });
+    
+    const answeredQuestions = [];
+    $('#question-grid .table-row').each(function(rowIdx) {
+        $(this).find('.table-cell').each(function(colIdx) {
+            if ($(this).find('h3').css('opacity') === '0') {
+                answeredQuestions.push(`${currentRound}-${rowIdx}-${colIdx}`);
+            }
+        });
+    });
+    
+    const progress = {
+        round: currentRound,
+        teams: teams,
+        answeredQuestions: answeredQuestions
+    };
+    
+    gameManager.saveProgress(currentGameData.id, progress);
+}
+
+// Auto-save with debounce
+let saveTimeout;
+function autoSave() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveProgress, 1000);
+}
+
+// Render game board from current game data
+function renderGameBoard() {
+    if (!currentGameData) return;
+    
+    const round = currentRound === 'single' ? 'single' : 'double';
+    
+    // Render categories
+    const categoriesHtml = currentGameData.categories.map((cat, idx) => `
+        <div class="table-cell">
+            <div class="table-cell-inner"><h2 data-title="${cat.double}">${cat[round]}</h2></div>
+        </div>
+    `).join('');
+    
+    $('#categories').html(categoriesHtml);
+    
+    // Render questions
+    const questionsHtml = currentGameData.questions[round].map((row, rowIdx) => {
+        const cells = row.map((q, colIdx) => `
+            <div data-points="${q.points}" data-dailydouble="" class="table-cell ${!q.answer && !q.question ? 'empty' : ''}">
+                <div class="table-cell-inner">
+                    <h3>${q.points}</h3>
+                    <div class="answer" data-answer="${escapeHtml(q.answer)}">${escapeHtml(q.answer)}</div>
+                    <div class="question" data-question="${escapeHtml(q.question)}">${escapeHtml(q.question)}</div>
+                </div>
+            </div>
+        `).join('');
+        
+        return `<div class="table-row">${cells}</div>`;
+    }).join('');
+    
+    $('#question-grid').html(questionsHtml);
+    
+    // Re-bind click events
+    bindQuestionEvents();
+    
+    $(window).resize();
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+// Bind events to question cells
+function bindQuestionEvents() {
+    $('#question-grid .table-cell:not(.empty) .table-cell-inner').off('mouseenter mouseleave click');
+    
+    $('#question-grid .table-cell:not(.empty) .table-cell-inner').mouseenter(function() {
+        $(this).find('h3').addClass('animated rubberBand');
+        $('#click')[0].play();
+    }).mouseleave(function() {
+        $(this).find('h3').removeClass('animated rubberBand');
+        $('#click')[0].currentTime = 0;
+    });
+    
+    $('#question-grid .table-cell:not(.empty)').on("click", function(){
+        modal.show(this);
+    });
+}
+
+// Populate game selector
+function populateGameSelector() {
+    const games = gameManager.getGamesList();
+    const currentGameId = gameManager.getCurrentGameId();
+    const select = $('#gameSelect');
+    
+    select.empty();
+    
+    if (games.length === 0) {
+        select.append('<option value="">No games available - Visit Admin</option>');
+        return;
+    }
+    
+    games.forEach(game => {
+        const option = $(`<option value="${game.id}">${game.name}</option>`);
+        if (game.id === currentGameId) {
+            option.attr('selected', 'selected');
+        }
+        select.append(option);
+    });
+}
+
+// Handle game selection change
+function handleGameChange() {
+    const selectedGameId = $('#gameSelect').val();
+    if (selectedGameId && selectedGameId !== gameManager.getCurrentGameId()) {
+        if (confirm('Switching games will reload the page. Continue?')) {
+            gameManager.setCurrentGameId(selectedGameId);
+            location.reload();
+        } else {
+            // Reset to current game
+            $('#gameSelect').val(gameManager.getCurrentGameId());
+        }
+    }
+}
+
     window.resizeiframe = function(){
         $('#myiframe').each(function(){
             if($(this).data("last-height") == this.height){
@@ -101,23 +353,43 @@
     });
 
 $(document).ready(function(){
-    var teamPointsArray = [];
-    var totalEl = $('#question-grid .table-cell').length + 1;
-    var randNum = Math.floor(Math.random() * totalEl);
-
-    // console.log(totalEl);
-    console.log('DAILY DOUBLE: ' + randNum);
-
-    $('[data-dailydouble]').each(function(i, obj) {
-        // console.log(i);
-        // console.log(i);
-        if (i == randNum) {
-        // console.log(this);
-        $(this).attr('data-dailydouble', 'daily-double');
-        }
+    // Populate game selector
+    populateGameSelector();
+    
+    // Bind game selector change event
+    $('#gameSelect').change(handleGameChange);
+    
+    // Load intro sound preference from localStorage
+    const playIntroSound = localStorage.getItem('playIntroSound');
+    if (playIntroSound !== null) {
+        $('#playIntroSound').prop('checked', playIntroSound === 'true');
+    }
+    
+    // Save intro sound preference when changed
+    $('#playIntroSound').change(function() {
+        localStorage.setItem('playIntroSound', $(this).is(':checked'));
     });
+    
+    // Load game data first
+    loadGameData();
+    
+    var teamPointsArray = [];
+    
+    // Set daily double after a short delay to ensure board is rendered
+    setTimeout(function() {
+        var totalEl = $('#question-grid .table-cell').length + 1;
+        var randNum = Math.floor(Math.random() * totalEl);
 
-    $(window).resize();
+        console.log('DAILY DOUBLE: ' + randNum);
+
+        $('[data-dailydouble]').each(function(i, obj) {
+            if (i == randNum) {
+                $(this).attr('data-dailydouble', 'daily-double');
+            }
+        });
+        
+        $(window).resize();
+    }, 100);
 
     $('#add-row').click(function(){
         if(!window.LOGGED_IN){
@@ -178,29 +450,23 @@ $(document).ready(function(){
         $('#question-grid .table-cell h3').css('opacity',1);
         $('#double-jeopardy').css('display','none');
 
-        $('#categories .table-cell').each(function(){
-            var newCategory = $(this).find('h2').attr('data-title');
-
-            $(this).find('h2').text(newCategory);
-
-            $(this).removeAttr('data-dailydouble');
-        });
-
-        $('#question-grid .table-cell').each(function(){
-            var doubled = $(this).attr('data-points') * 2;
-
-            $(this).attr('data-points', doubled);
-            $(this).find('h3').text(doubled);
-
-            var newAnswer = $(this).find('.answer').attr('data-answer');
-            var newQuestion = $(this).find('.question').attr('data-question');
-            $(this).find('.answer').html(newAnswer);
-            $(this).find('.question').html(newQuestion);
-
-            $(this).removeAttr('data-dailydouble');
+        // Switch to double jeopardy round
+        currentRound = 'double';
+        renderGameBoard();
+        
+        // Set new daily double
+        var totalEl = $('#question-grid .table-cell').length + 1;
+        var randNum = Math.floor(Math.random() * totalEl);
+        console.log('DOUBLE JEOPARDY DAILY DOUBLE: ' + randNum);
+        
+        $('[data-dailydouble]').each(function(i, obj) {
+            if (i == randNum) {
+                $(this).attr('data-dailydouble', 'daily-double');
+            }
         });
 
         $('#suspenseful')[0].play();
+        autoSave();
     });
 });
 </script>
@@ -237,8 +503,11 @@ try {
 
 game.init = function(no_push_state){
 // $('#begin')[0].play();
-$('#thisisjeopardy')[0].play();
-var val = $('#options select').val();
+// Check if intro sound should play
+if ($('#playIntroSound').is(':checked')) {
+    $('#thisisjeopardy')[0].play();
+}
+var val = $('#teamSelect').val();
 $('#options').hide();
 var teams = $('#teams .team');
 for(var i = 0; i < val; i++){
@@ -590,14 +859,6 @@ modal.hide = function(){
 
 $(document).ready(function(){
 
-    $('#question-grid .table-cell:not(.empty) .table-cell-inner').mouseenter(function() {
-        $(this).find('h3').addClass('animated rubberBand');
-        $('#click')[0].play();
-    }).mouseleave(function() {
-        $(this).find('h3').removeClass('animated rubberBand');
-        $('#click')[0].currentTime = 0;
-    });
-
     $('#question-modal').on("click", '#answer-button', function(){
         modal.reveal();
     })
@@ -605,11 +866,21 @@ $(document).ready(function(){
     $('#question-modal').on("click", '#continue-button', function(){
         modal.hide();
     });
-
-    $('#question-grid .table-cell:not(.empty)').on("click", function(){
-    // figure out the point value of the thing that was clicked
-    modal.show(this);
-});
+    
+    // Reset progress button
+    $('#resetProgress').on('click', function() {
+        if (confirm('Are you sure you want to reset all game progress? This will clear all scores and answered questions.')) {
+            if (currentGameData && currentGameData.id) {
+                gameManager.clearProgress(currentGameData.id);
+            }
+            location.reload();
+        }
+    });
+    
+    // Auto-save when team names change
+    $('body').on('blur', '.team .name', function() {
+        autoSave();
+    });
 
 // prevent the buttons from being highlighted
 $('body').on("mousedown", ".minus, .plus", function(e){
@@ -637,6 +908,7 @@ $('body').on("click", ".plus", function(e){
     });
 
     $('#right')[0].play();
+    autoSave();
 });
 
 $('body').on("click", ".minus", function(e){
@@ -658,6 +930,7 @@ $('body').on("click", ".minus", function(e){
     });
 
     $('#wrong')[0].play();
+    autoSave();
 });
 
 $(window).resize();
@@ -671,220 +944,18 @@ $(window).resize();
 
     <div id="gameplay">
         <div class="table-row" id="categories">
-            <div class="table-cell">
-                <div class="table-cell-inner"><h2 data-title="MARKETING 101">CLIENT CODES</h2></div>
-            </div>
-            <div class="table-cell">
-                <div class="table-cell-inner"><h2 data-title="DO YOU EVEN GTM BRO">TALK DATA TO ME</h2></div>
-            </div>
-            <div class="table-cell">
-                <div class="table-cell-inner"><h2 data-title="POTPOURRI">GAGA FOR GA</h2></div>
-            </div>
-            <div class="table-cell">
-                <div class="table-cell-inner"><h2 data-title="HOHO OR NO">YOU'VE GOT MAIL</h2></div>
-            </div>
-            <div class="table-cell">
-                <div class="table-cell-inner"><h2 data-title="MORE ACRONYMS">WTF IS AN ACRONYM</h2></div>
-            </div>
+            <!-- Categories will be dynamically generated -->
         </div>
 
         <div id="question-grid">
-            <div class="table-row">
-                <div data-points="100" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>100</h3>
-                        <div class="answer" data-answer="The use of data to gain insights from data to maximize marketing outcomes.">FREE</div>
-                        <div class="question" data-question="What is Marketing analytics?">South Dakota Freedom Scholarship Fund</div>
-                    </div>
-                </div>
-                <div data-points="100" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>100</h3>
-                        <div class="answer" data-answer="Contains information about user interactions on your website.">The amount of searches Google receives every second.</div>
-                        <div class="question" data-question="What is the purpose of data layer?">What is over 105,191?</div>
-                    </div>
-                </div>
-                <div data-points="100" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>100</h3>
-                        <div class="answer" data-answer="Invisible tags that provide data about your page to search engines and website visitors.">Universal Analytics has a session-based data model and gathers data as hits within these sessions. This information includes page hits and event hits. However, GA4 utilizes this to collects data in the form of events.</div>
-                        <div class="question" data-question="What are Meta tags?">What is a user-based model?</div>
-                    </div>
-                </div>
-                <div data-points="100" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>100</h3>
-                        <div class="answer" data-answer="The name of our James Bond themed HO-HO.">Is the term for unwanted or unsolicited email.</div>
-                        <div class="question" data-question="What was DOUBLE HO7?">What is SPAM?</div>
-                    </div>
-                </div>
-                <div data-points="100" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>100</h3>
-                        <div class="answer" data-answer="These are relevant metrics (such as open, click-through, bounce, and conversion rates) that help you track and measure success—is key to achieving your goals.">The process of optimizing your web site to have it listed amongst the first natural/organic results when users query a search engine for a service or product you offer.</div>
-                        <div class="question" data-question="What is KPI? (key Performance Indicator)">What is SEO? (Search Engine Optimization)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-row">
-                <div data-points="200" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>200</h3>
-                        <div class="answer" data-answer="The three legs of marketing analytics.">RADB</div>
-                        <div class="question" data-question="What are Data, analytics and visualization?">Radisson Blu</div>
-                    </div>
-                </div>
-                <div data-points="200" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>200</h3>
-                        <div class="answer" data-answer="Allows you to inject custom HTML code into your website.">The maximum number of characters per Tweet.</div>
-                        <div class="question" data-question="What is the purpose of the Custom HTML tag?">What is 280?</div>
-                    </div>
-                </div>
-                <div data-points="200" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>200</h3>
-                        <div class="answer" data-answer="The advertising method used when an advertiser pays based on how many times users visit a URL in an ad on a company's web page or social media page.">This technology can also predict outcomes, including churn rates and potential conversions and sales. Marketers can use these insights to promote the right products and target relevant audiences.</div>
-                        <div class="question" data-question="What is Pay-Per-Click?">What is machine learning?</div>
-                    </div>
-                </div>
-                <div data-points="200" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>200</h3>
-                        <div class="answer" data-answer="Almost got us sued by the International Olympic Committee (IOC). ">A method for testing a user's behavior by experimenting with different campaign elements.</div>
-                        <div class="question" data-question="What was HO-LYMPICS?">What is A/B Testing?</div>
-                    </div>
-                </div>
-                <div data-points="200" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>200</h3>
-                        <div class="answer" data-answer="Is a calculation of the monetary value of an investment versus its cost that's defined as the ratio of net profit over the total cost of the investment.">One of the metrics used to measure an advertising campaign's success. It's the percentage of how many people viewed something and then clicked on a link.</div>
-                        <div class="question" data-question="What is ROI? (Return on Investment)">What is CTR? (Click-Through Rate)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-row">
-                <div data-points="300" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>300</h3>
-                        <div class="answer" data-answer="A representation of the goals and behaviors of a group of users.">TRMF</div>
-                        <div class="question" data-question="What is a marketing persona?">Theodore Roosevelt Medora Foundation</div>
-                    </div>
-                </div>
-                <div data-points="300" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>300</h3>
-                        <div class="answer" data-answer="Allows you to create custom tags using HTML, CSS and JavaScript.">The industry average email click-through rate (CTR).</div>
-                        <div class="question" data-question="What is the Custom Template tag?">What is 2.13%?</div>
-                    </div>
-                </div>
-                <div data-points="300" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>300</h3>
-                        <div class="answer" data-answer="The type of research you are doing by looking up words or phrases that your audience is searching for.">GA4 was designed specifically with the decline of these in mind.</div>
-                        <div class="question" data-question="What is Keyword?">What are third-party cookies?</div>
-                    </div>
-                </div>
-                <div data-points="300" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>300</h3>
-                        <div class="answer" data-answer="Name of the Hawaiian themed HO-HO.">A security mechanism that creates a virtual trap to lure attackers.</div>
-                        <div class="question" data-question="What was the ALOH-HO?">What is Honeypot?</div>
-                    </div>
-                </div>
-                <div data-points="300" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>300</h3>
-                        <div class="answer" data-answer="Will help you retain current customers, increase their spending, and convert prospects into new customers.">It's the sales instructions, typically at the end of your marketing message, that tells customers to 'Buy now!'' or 'Sign up today.'</div>
-                        <div class="question" data-question="What is CRM? (Customer Relationship Management)">What is CTA? (Call to Action)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-row">
-                <div data-points="400" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>400</h3>
-                        <div class="answer" data-answer="Make your website interactive combining different types of assets like images, quizzes, downloads, videos, and audio.">HCPD</div>
-                        <div class="question" data-question="What is the best way to increase engagement on your website?">Heartland Consumer Power District</div>
-                    </div>
-                </div>
-                <div data-points="400" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>400</h3>
-                        <div class="answer" data-answer="An event that is triggered when a data layer object is pushed to the data layer.">The single largest online traffic source.</div>
-                        <div class="question" data-question="What is a Data Layer Event?">What is search?</div>
-                    </div>
-                </div>
-                <div data-points="400" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>400</h3>
-                        <div class="answer" data-answer="The term given to a software application that automatically downloads or displays marketing banners or pop-ups when a user is online.">The most likely medium for an Instagram post.</div>
-                        <div class="question" data-question="What is Adware?">What is Social?</div>
-                    </div>
-                </div>
-                <div data-points="400" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>400</h3>
-                        <div class="answer" data-answer="The name of our last HO-HO.">Occurs when an emailer impersonates a legitimate company or brand in the emails "from" line, to trick people into opening email and providing personal information.</div>
-                        <div class="question" data-question="What was THR-HO-BACK?">What is Phishing?</div>
-                    </div>
-                </div>
-                <div data-points="400" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>400</h3>
-                        <div class="answer" data-answer="How a customer interacts with your brand. Having a smooth user experience—a functional app interface, an intuitive website—creates positive impressions about what you do, and ultimately makes it easier for people to access your products and services.">Highlights the level of investment needed to have customers reach certain milestones: clicking on your website, subscribing to a newsletter or purchasing a product. Knowing this number can help compare which marketing strategies are the most cost effective.</div>
-                        <div class="question" data-question="What is UX? (User Experience)">What is CPA? (Cost Per Action)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-row">
-                <div data-points="500" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>500</h3>
-                        <div class="answer" data-answer="Awareness, Interest, Consideration, Evaluation, Purchase.">CCFS</div>
-                        <div class="question" data-question="What is the right sequence of stages in the marketing funnel?">Casey Crabtree for Senate</div>
-                    </div>
-                </div>
-                <div data-points="500" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>500</h3>
-                        <div class="answer" data-answer="Allows you to define your Google Analytics tracking code settings?">The artificial intelligence that's now processing a 'very large fraction' of queries on Google.</div>
-                        <div class="question" data-question="What is the Google Analytics Settings variable?">What is RankBrain?</div>
-                    </div>
-                </div>
-                <div data-points="500" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>500</h3>
-                        <div class="answer" data-answer="The color you get if you mix together the two colors that appear twice in the Google logo.">The filename of the Global Site Tag.</div>
-                        <div class="question" data-question="What is the color Purple?">What is GTAG.js?</div>
-                    </div>
-                </div>
-                <div data-points="500" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>500</h3>
-                        <div class="answer" data-answer="Name of the HO-HO that celebrated Lawrence & Schillers 40th anniversary.">A law that sets the rules for commercial email, establishes requirements for commercial messages, gives recipients the right to have you stop emailing them, and spells out tough penalties for violations.</div>
-                        <div class="question" data-question="What was the THE BIG 4HO?">What is the CAN-SPAM Act?</div>
-                    </div>
-                </div>
-                <div data-points="500" data-dailydouble="" class="table-cell ">
-                    <div class="table-cell-inner">
-                        <h3>500</h3>
-                        <div class="answer" data-answer="When people are talking about your business in their online and real life conversations.">A set of definitions and protocols for building and integrating application software.</div>
-                        <div class="question" data-question="What is WOM? (Word-of-mouth)">What is AN API? (Application Programming Interface)</div>
-                    </div>
-                </div>
-            </div>
+            <!-- Questions will be dynamically generated -->
         </div>
 
         <button id="double-jeopardy">DOUBLE JEOPARDY</button>
 
         <div id="teams">
 
-            <div class="team" style="display:none">
+            <div class="team">
                 <h3 class="name" contenteditable="true">Team 1</h3>
                 <h3 class="points" contenteditable="true">0</h3>
                 <div class="pointer">
@@ -893,7 +964,7 @@ $(window).resize();
                 </div>
             </div>
 
-            <div class="team" style="display:none">
+            <div class="team">
                 <h3 class="name" contenteditable="true">Team 2</h3>
                 <h3 class="points" contenteditable="true">0</h3>
                 <div class="pointer">
@@ -902,7 +973,7 @@ $(window).resize();
                 </div>
             </div>
 
-            <div class="team" style="display:none">
+            <div class="team">
                 <h3 class="name" contenteditable="true">Team 3</h3>
                 <h3 class="points" contenteditable="true">0</h3>
                 <div class="pointer">
@@ -911,7 +982,7 @@ $(window).resize();
                 </div>
             </div>
 
-            <div class="team" style="display:none">
+            <div class="team">
                 <h3 class="name" contenteditable="true">Team 4</h3>
                 <h3 class="points" contenteditable="true">0</h3>
                 <div class="pointer">
@@ -920,113 +991,6 @@ $(window).resize();
                 </div>
             </div>
 
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 5</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 6</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 7</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 8</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 9</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 10</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 11</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 12</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 13</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 14</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 15</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
-
-            <div class="team" style="display:none">
-                <h3 class="name" contenteditable="true">Team 16</h3>
-                <h3 class="points" contenteditable="true">0</h3>
-                <div class="pointer">
-                    <span class="plus">+</span>
-                    <span class="minus">-</span>
-                </div>
-            </div>
         </div>
 
         <div id="question-modal" class="modal-wrapper">
@@ -1044,30 +1008,41 @@ $(window).resize();
 
     <div id="options" class="modal-wrapper">
         <div class="modal">
-            <img style="display:block;margin:0 auto;width:300px;" src="images/digi-jeopardy.png" alt="Digi Jeopardy" />
-            <select>
-                <option value="1">1 team</option>     
-                <option value="2">2 teams</option>
-                <option value="3">3 teams</option>
-                <option value="4">4 teams</option>
-                <option value="5">5 teams</option>
-                <option value="6">6 teams</option>
-                <option value="7">7 teams</option>
-                <option value="8">8 teams</option>
-                <option value="9">9 teams</option>
-                <option value="10">10 teams</option>  
-                <option value="11">11 teams</option>
-                <option value="12">12 teams</option>  
-                <option value="13">13 teams</option>  
-                <option value="14">14 teams</option>  
-                <option value="15">15 teams</option>  
-                <option value="16">16 teams</option>  
-            </select>
+            <img class="options-logo" src="images/digi-jeopardy.png" alt="Digi Jeopardy" />
+            
+            <div class="game-selector-wrapper">
+                <label class="game-selector-label">Select Game:</label>
+                <select id="gameSelect">
+                    <!-- Games will be populated here -->
+                </select>
+            </div>
+            
+            <div class="team-selector-wrapper">
+                <label class="team-selector-label">Number of Teams:</label>
+                <select id="teamSelect">
+                    <option value="1">1 team</option>     
+                    <option value="2">2 teams</option>
+                    <option value="3">3 teams</option>
+                    <option value="4">4 teams</option>
+                </select>
+            </div>
+            
+            <div class="sound-option-wrapper">
+                <label class="sound-option-label">
+                    <input type="checkbox" id="playIntroSound" checked>
+                    Play intro sound when game starts
+                </label>
+            </div>
+            
             <input class="submit" type="button" id="submit" value="Start" onclick="game.init()" />
-            <div id="reset-all" style="display:none">
+            <div id="reset-all">
                 <a href="">Reset Scores</a>
             </div>
-            <p id="fullscreen" style="margin-top:20px; display:none" align="center">Press <kbd id="windows" style="display:none">F11</kbd> <kbd id="mac" style="display:none">View &gt; Enter Fullscreen</kbd> for full-screen mode</p>
+            <div id="manage-buttons">
+                <button class="submit" id="resetProgress">Reset Game Progress</button>
+                <a href="admin.html" class="submit admin-link">Manage Games</a>
+            </div>
+            <p id="fullscreen" align="center">Press <kbd id="windows">F11</kbd> <kbd id="mac">View &gt; Enter Fullscreen</kbd> for full-screen mode</p>
             <script>
             if(window.navigator.platform.indexOf("Mac") == 0){
                 $('#fullscreen, #mac').show();
@@ -1085,17 +1060,6 @@ $(window).resize();
     <audio id="suspenseful"><source src="audio/suspenseful.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
     <audio id="thisisjeopardy"><source src="audio/thisisjeopardy.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
     <audio id="click"><source src="audio/click.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-
-    <audio id="one"><source src="audio/soundboard/1.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="two"><source src="audio/soundboard/2.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="three"><source src="audio/soundboard/3.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="four"><source src="audio/soundboard/4.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="five"><source src="audio/soundboard/5.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="six"><source src="audio/soundboard/6.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="seven"><source src="audio/soundboard/7.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="eight"><source src="audio/soundboard/8.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="nine"><source src="audio/soundboard/9.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
-    <audio id="zero"><source src="audio/soundboard/0.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio>
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>

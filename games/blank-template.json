@@ -1,0 +1,103 @@
+{
+  "id": "blank_template",
+  "name": "Blank Template",
+  "categories": [
+    {
+      "single": "Category 1",
+      "double": "Double Category 1"
+    },
+    {
+      "single": "Category 2",
+      "double": "Double Category 2"
+    },
+    {
+      "single": "Category 3",
+      "double": "Double Category 3"
+    },
+    {
+      "single": "Category 4",
+      "double": "Double Category 4"
+    },
+    {
+      "single": "Category 5",
+      "double": "Double Category 5"
+    }
+  ],
+  "questions": {
+    "single": [
+      [
+        {"points": 100, "answer": "Answer 1-1", "question": "What is Question 1-1?"},
+        {"points": 100, "answer": "Answer 1-2", "question": "What is Question 1-2?"},
+        {"points": 100, "answer": "Answer 1-3", "question": "What is Question 1-3?"},
+        {"points": 100, "answer": "Answer 1-4", "question": "What is Question 1-4?"},
+        {"points": 100, "answer": "Answer 1-5", "question": "What is Question 1-5?"}
+      ],
+      [
+        {"points": 200, "answer": "Answer 2-1", "question": "What is Question 2-1?"},
+        {"points": 200, "answer": "Answer 2-2", "question": "What is Question 2-2?"},
+        {"points": 200, "answer": "Answer 2-3", "question": "What is Question 2-3?"},
+        {"points": 200, "answer": "Answer 2-4", "question": "What is Question 2-4?"},
+        {"points": 200, "answer": "Answer 2-5", "question": "What is Question 2-5?"}
+      ],
+      [
+        {"points": 300, "answer": "Answer 3-1", "question": "What is Question 3-1?"},
+        {"points": 300, "answer": "Answer 3-2", "question": "What is Question 3-2?"},
+        {"points": 300, "answer": "Answer 3-3", "question": "What is Question 3-3?"},
+        {"points": 300, "answer": "Answer 3-4", "question": "What is Question 3-4?"},
+        {"points": 300, "answer": "Answer 3-5", "question": "What is Question 3-5?"}
+      ],
+      [
+        {"points": 400, "answer": "Answer 4-1", "question": "What is Question 4-1?"},
+        {"points": 400, "answer": "Answer 4-2", "question": "What is Question 4-2?"},
+        {"points": 400, "answer": "Answer 4-3", "question": "What is Question 4-3?"},
+        {"points": 400, "answer": "Answer 4-4", "question": "What is Question 4-4?"},
+        {"points": 400, "answer": "Answer 4-5", "question": "What is Question 4-5?"}
+      ],
+      [
+        {"points": 500, "answer": "Answer 5-1", "question": "What is Question 5-1?"},
+        {"points": 500, "answer": "Answer 5-2", "question": "What is Question 5-2?"},
+        {"points": 500, "answer": "Answer 5-3", "question": "What is Question 5-3?"},
+        {"points": 500, "answer": "Answer 5-4", "question": "What is Question 5-4?"},
+        {"points": 500, "answer": "Answer 5-5", "question": "What is Question 5-5?"}
+      ]
+    ],
+    "double": [
+      [
+        {"points": 200, "answer": "Double Answer 1-1", "question": "What is Double Question 1-1?"},
+        {"points": 200, "answer": "Double Answer 1-2", "question": "What is Double Question 1-2?"},
+        {"points": 200, "answer": "Double Answer 1-3", "question": "What is Double Question 1-3?"},
+        {"points": 200, "answer": "Double Answer 1-4", "question": "What is Double Question 1-4?"},
+        {"points": 200, "answer": "Double Answer 1-5", "question": "What is Double Question 1-5?"}
+      ],
+      [
+        {"points": 400, "answer": "Double Answer 2-1", "question": "What is Double Question 2-1?"},
+        {"points": 400, "answer": "Double Answer 2-2", "question": "What is Double Question 2-2?"},
+        {"points": 400, "answer": "Double Answer 2-3", "question": "What is Double Question 2-3?"},
+        {"points": 400, "answer": "Double Answer 2-4", "question": "What is Double Question 2-4?"},
+        {"points": 400, "answer": "Double Answer 2-5", "question": "What is Double Question 2-5?"}
+      ],
+      [
+        {"points": 600, "answer": "Double Answer 3-1", "question": "What is Double Question 3-1?"},
+        {"points": 600, "answer": "Double Answer 3-2", "question": "What is Double Question 3-2?"},
+        {"points": 600, "answer": "Double Answer 3-3", "question": "What is Double Question 3-3?"},
+        {"points": 600, "answer": "Double Answer 3-4", "question": "What is Double Question 3-4?"},
+        {"points": 600, "answer": "Double Answer 3-5", "question": "What is Double Question 3-5?"}
+      ],
+      [
+        {"points": 800, "answer": "Double Answer 4-1", "question": "What is Double Question 4-1?"},
+        {"points": 800, "answer": "Double Answer 4-2", "question": "What is Double Question 4-2?"},
+        {"points": 800, "answer": "Double Answer 4-3", "question": "What is Double Question 4-3?"},
+        {"points": 800, "answer": "Double Answer 4-4", "question": "What is Double Question 4-4?"},
+        {"points": 800, "answer": "Double Answer 4-5", "question": "What is Double Question 4-5?"}
+      ],
+      [
+        {"points": 1000, "answer": "Double Answer 5-1", "question": "What is Double Question 5-1?"},
+        {"points": 1000, "answer": "Double Answer 5-2", "question": "What is Double Question 5-2?"},
+        {"points": 1000, "answer": "Double Answer 5-3", "question": "What is Double Question 5-3?"},
+        {"points": 1000, "answer": "Double Answer 5-4", "question": "What is Double Question 5-4?"},
+        {"points": 1000, "answer": "Double Answer 5-5", "question": "What is Double Question 5-5?"}
+      ]
+    ]
+  }
+}
+

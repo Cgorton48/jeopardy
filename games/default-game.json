@@ -1,0 +1,303 @@
+{
+  "id": "default_marketing_game",
+  "name": "Marketing Analytics Jeopardy",
+  "categories": [
+    {
+      "single": "CLIENT CODES",
+      "double": "MARKETING 101"
+    },
+    {
+      "single": "TALK DATA TO ME",
+      "double": "DO YOU EVEN GTM BRO"
+    },
+    {
+      "single": "GAGA FOR GA",
+      "double": "POTPOURRI"
+    },
+    {
+      "single": "YOU'VE GOT MAIL",
+      "double": "HOHO OR NO"
+    },
+    {
+      "single": "WTF IS AN ACRONYM",
+      "double": "MORE ACRONYMS"
+    }
+  ],
+  "questions": {
+    "single": [
+      [
+        {
+          "points": 100,
+          "answer": "South Dakota Freedom Scholarship Fund",
+          "question": "What is Marketing analytics?"
+        },
+        {
+          "points": 100,
+          "answer": "The amount of searches Google receives every second.",
+          "question": "What is over 105,191?"
+        },
+        {
+          "points": 100,
+          "answer": "Universal Analytics has a session-based data model and gathers data as hits within these sessions. This information includes page hits and event hits. However, GA4 utilizes this to collects data in the form of events.",
+          "question": "What is a user-based model?"
+        },
+        {
+          "points": 100,
+          "answer": "Is the term for unwanted or unsolicited email.",
+          "question": "What is SPAM?"
+        },
+        {
+          "points": 100,
+          "answer": "The process of optimizing your web site to have it listed amongst the first natural/organic results when users query a search engine for a service or product you offer.",
+          "question": "What is SEO? (Search Engine Optimization)"
+        }
+      ],
+      [
+        {
+          "points": 200,
+          "answer": "RADB",
+          "question": "Radisson Blu"
+        },
+        {
+          "points": 200,
+          "answer": "The maximum number of characters per Tweet.",
+          "question": "What is 280?"
+        },
+        {
+          "points": 200,
+          "answer": "This technology can also predict outcomes, including churn rates and potential conversions and sales. Marketers can use these insights to promote the right products and target relevant audiences.",
+          "question": "What is machine learning?"
+        },
+        {
+          "points": 200,
+          "answer": "A method for testing a user's behavior by experimenting with different campaign elements.",
+          "question": "What is A/B Testing?"
+        },
+        {
+          "points": 200,
+          "answer": "One of the metrics used to measure an advertising campaign's success. It's the percentage of how many people viewed something and then clicked on a link.",
+          "question": "What is CTR? (Click-Through Rate)"
+        }
+      ],
+      [
+        {
+          "points": 300,
+          "answer": "TRMF",
+          "question": "Theodore Roosevelt Medora Foundation"
+        },
+        {
+          "points": 300,
+          "answer": "The industry average email click-through rate (CTR).",
+          "question": "What is 2.13%?"
+        },
+        {
+          "points": 300,
+          "answer": "GA4 was designed specifically with the decline of these in mind.",
+          "question": "What are third-party cookies?"
+        },
+        {
+          "points": 300,
+          "answer": "A security mechanism that creates a virtual trap to lure attackers.",
+          "question": "What is Honeypot?"
+        },
+        {
+          "points": 300,
+          "answer": "It's the sales instructions, typically at the end of your marketing message, that tells customers to 'Buy now!'' or 'Sign up today.'",
+          "question": "What is CTA? (Call to Action)"
+        }
+      ],
+      [
+        {
+          "points": 400,
+          "answer": "HCPD",
+          "question": "Heartland Consumer Power District"
+        },
+        {
+          "points": 400,
+          "answer": "The single largest online traffic source.",
+          "question": "What is search?"
+        },
+        {
+          "points": 400,
+          "answer": "The most likely medium for an Instagram post.",
+          "question": "What is Social?"
+        },
+        {
+          "points": 400,
+          "answer": "Occurs when an emailer impersonates a legitimate company or brand in the emails \"from\" line, to trick people into opening email and providing personal information.",
+          "question": "What is Phishing?"
+        },
+        {
+          "points": 400,
+          "answer": "Highlights the level of investment needed to have customers reach certain milestones: clicking on your website, subscribing to a newsletter or purchasing a product. Knowing this number can help compare which marketing strategies are the most cost effective.",
+          "question": "What is CPA? (Cost Per Action)"
+        }
+      ],
+      [
+        {
+          "points": 500,
+          "answer": "CCFS",
+          "question": "Casey Crabtree for Senate"
+        },
+        {
+          "points": 500,
+          "answer": "The artificial intelligence that's now processing a 'very large fraction' of queries on Google.",
+          "question": "What is RankBrain?"
+        },
+        {
+          "points": 500,
+          "answer": "The filename of the Global Site Tag.",
+          "question": "What is GTAG.js?"
+        },
+        {
+          "points": 500,
+          "answer": "A law that sets the rules for commercial email, establishes requirements for commercial messages, gives recipients the right to have you stop emailing them, and spells out tough penalties for violations.",
+          "question": "What is the CAN-SPAM Act?"
+        },
+        {
+          "points": 500,
+          "answer": "A set of definitions and protocols for building and integrating application software.",
+          "question": "What is AN API? (Application Programming Interface)"
+        }
+      ]
+    ],
+    "double": [
+      [
+        {
+          "points": 200,
+          "answer": "The use of data to gain insights from data to maximize marketing outcomes.",
+          "question": "What is Marketing analytics?"
+        },
+        {
+          "points": 200,
+          "answer": "Contains information about user interactions on your website.",
+          "question": "What is the purpose of data layer?"
+        },
+        {
+          "points": 200,
+          "answer": "Invisible tags that provide data about your page to search engines and website visitors.",
+          "question": "What are Meta tags?"
+        },
+        {
+          "points": 200,
+          "answer": "The name of our James Bond themed HO-HO.",
+          "question": "What was DOUBLE HO7?"
+        },
+        {
+          "points": 200,
+          "answer": "These are relevant metrics (such as open, click-through, bounce, and conversion rates) that help you track and measure success—is key to achieving your goals.",
+          "question": "What is KPI? (key Performance Indicator)"
+        }
+      ],
+      [
+        {
+          "points": 400,
+          "answer": "The three legs of marketing analytics.",
+          "question": "What are Data, analytics and visualization?"
+        },
+        {
+          "points": 400,
+          "answer": "Allows you to inject custom HTML code into your website.",
+          "question": "What is the purpose of the Custom HTML tag?"
+        },
+        {
+          "points": 400,
+          "answer": "The advertising method used when an advertiser pays based on how many times users visit a URL in an ad on a company's web page or social media page.",
+          "question": "What is Pay-Per-Click?"
+        },
+        {
+          "points": 400,
+          "answer": "Almost got us sued by the International Olympic Committee (IOC). ",
+          "question": "What was HO-LYMPICS?"
+        },
+        {
+          "points": 400,
+          "answer": "Is a calculation of the monetary value of an investment versus its cost that's defined as the ratio of net profit over the total cost of the investment.",
+          "question": "What is ROI? (Return on Investment)"
+        }
+      ],
+      [
+        {
+          "points": 600,
+          "answer": "A representation of the goals and behaviors of a group of users.",
+          "question": "What is a marketing persona?"
+        },
+        {
+          "points": 600,
+          "answer": "Allows you to create custom tags using HTML, CSS and JavaScript.",
+          "question": "What is the Custom Template tag?"
+        },
+        {
+          "points": 600,
+          "answer": "The type of research you are doing by looking up words or phrases that your audience is searching for.",
+          "question": "What is Keyword?"
+        },
+        {
+          "points": 600,
+          "answer": "Name of the Hawaiian themed HO-HO.",
+          "question": "What was the ALOH-HO?"
+        },
+        {
+          "points": 600,
+          "answer": "Will help you retain current customers, increase their spending, and convert prospects into new customers.",
+          "question": "What is CRM? (Customer Relationship Management)"
+        }
+      ],
+      [
+        {
+          "points": 800,
+          "answer": "Make your website interactive combining different types of assets like images, quizzes, downloads, videos, and audio.",
+          "question": "What is the best way to increase engagement on your website?"
+        },
+        {
+          "points": 800,
+          "answer": "An event that is triggered when a data layer object is pushed to the data layer.",
+          "question": "What is a Data Layer Event?"
+        },
+        {
+          "points": 800,
+          "answer": "The term given to a software application that automatically downloads or displays marketing banners or pop-ups when a user is online.",
+          "question": "What is Adware?"
+        },
+        {
+          "points": 800,
+          "answer": "The name of our last HO-HO.",
+          "question": "What was THR-HO-BACK?"
+        },
+        {
+          "points": 800,
+          "answer": "How a customer interacts with your brand. Having a smooth user experience—a functional app interface, an intuitive website—creates positive impressions about what you do, and ultimately makes it easier for people to access your products and services.",
+          "question": "What is UX? (User Experience)"
+        }
+      ],
+      [
+        {
+          "points": 1000,
+          "answer": "Awareness, Interest, Consideration, Evaluation, Purchase.",
+          "question": "What is the right sequence of stages in the marketing funnel?"
+        },
+        {
+          "points": 1000,
+          "answer": "Allows you to define your Google Analytics tracking code settings?",
+          "question": "What is the Google Analytics Settings variable?"
+        },
+        {
+          "points": 1000,
+          "answer": "The color you get if you mix together the two colors that appear twice in the Google logo.",
+          "question": "What is the color Purple?"
+        },
+        {
+          "points": 1000,
+          "answer": "Name of the HO-HO that celebrated Lawrence & Schillers 40th anniversary.",
+          "question": "What was the THE BIG 4HO?"
+        },
+        {
+          "points": 1000,
+          "answer": "When people are talking about your business in their online and real life conversations.",
+          "question": "What is WOM? (Word-of-mouth)"
+        }
+      ]
+    ]
+  }
+}
+

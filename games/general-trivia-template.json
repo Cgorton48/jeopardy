@@ -1,0 +1,103 @@
+{
+  "id": "general_trivia_template",
+  "name": "General Trivia Template",
+  "categories": [
+    {
+      "single": "HISTORY",
+      "double": "WORLD HISTORY"
+    },
+    {
+      "single": "SCIENCE",
+      "double": "ADVANCED SCIENCE"
+    },
+    {
+      "single": "GEOGRAPHY",
+      "double": "WORLD GEOGRAPHY"
+    },
+    {
+      "single": "ENTERTAINMENT",
+      "double": "POP CULTURE"
+    },
+    {
+      "single": "SPORTS",
+      "double": "SPORTS LEGENDS"
+    }
+  ],
+  "questions": {
+    "single": [
+      [
+        {"points": 100, "answer": "This country gave the Statue of Liberty to the United States.", "question": "What is France?"},
+        {"points": 100, "answer": "The chemical symbol for water.", "question": "What is H2O?"},
+        {"points": 100, "answer": "The capital of France.", "question": "What is Paris?"},
+        {"points": 100, "answer": "This actor played Iron Man in the Marvel movies.", "question": "Who is Robert Downey Jr.?"},
+        {"points": 100, "answer": "The number of players on a baseball team.", "question": "What is 9?"}
+      ],
+      [
+        {"points": 200, "answer": "The year Christopher Columbus discovered America.", "question": "What is 1492?"},
+        {"points": 200, "answer": "The planet known as the Red Planet.", "question": "What is Mars?"},
+        {"points": 200, "answer": "The largest ocean on Earth.", "question": "What is the Pacific Ocean?"},
+        {"points": 200, "answer": "The streaming service known for 'Stranger Things' and 'The Crown'.", "question": "What is Netflix?"},
+        {"points": 200, "answer": "The sport associated with Wimbledon.", "question": "What is tennis?"}
+      ],
+      [
+        {"points": 300, "answer": "The first President of the United States.", "question": "Who is George Washington?"},
+        {"points": 300, "answer": "The study of living organisms.", "question": "What is biology?"},
+        {"points": 300, "answer": "The longest river in the world.", "question": "What is the Nile River?"},
+        {"points": 300, "answer": "The movie that won Best Picture at the 2020 Oscars.", "question": "What is Parasite?"},
+        {"points": 300, "answer": "The number of rings on the Olympic flag.", "question": "What is five?"}
+      ],
+      [
+        {"points": 400, "answer": "The ancient wonder of the world still standing today.", "question": "What is the Great Pyramid of Giza?"},
+        {"points": 400, "answer": "The scientist who developed the theory of relativity.", "question": "Who is Albert Einstein?"},
+        {"points": 400, "answer": "The smallest country in the world.", "question": "What is Vatican City?"},
+        {"points": 400, "answer": "The highest-grossing film of all time (as of 2023).", "question": "What is Avatar?"},
+        {"points": 400, "answer": "The country that has won the most FIFA World Cups.", "question": "What is Brazil?"}
+      ],
+      [
+        {"points": 500, "answer": "The year World War II ended.", "question": "What is 1945?"},
+        {"points": 500, "answer": "The hardest natural substance on Earth.", "question": "What is diamond?"},
+        {"points": 500, "answer": "The number of countries in Africa.", "question": "What is 54?"},
+        {"points": 500, "answer": "The Beatles' first album released in 1963.", "question": "What is Please Please Me?"},
+        {"points": 500, "answer": "The boxer known as 'The Greatest' who changed his name from Cassius Clay.", "question": "Who is Muhammad Ali?"}
+      ]
+    ],
+    "double": [
+      [
+        {"points": 200, "answer": "The Roman Emperor who famously 'fiddled while Rome burned'.", "question": "Who is Nero?"},
+        {"points": 200, "answer": "The number of bones in the adult human body.", "question": "What is 206?"},
+        {"points": 200, "answer": "The capital of Australia.", "question": "What is Canberra?"},
+        {"points": 200, "answer": "The director of 'The Godfather' trilogy.", "question": "Who is Francis Ford Coppola?"},
+        {"points": 200, "answer": "The year the first modern Olympic Games were held.", "question": "What is 1896?"}
+      ],
+      [
+        {"points": 400, "answer": "The shortest war in history lasted only 38 minutes between these two countries.", "question": "What are England and Zanzibar?"},
+        {"points": 400, "answer": "The speed of light in meters per second.", "question": "What is 299,792,458?"},
+        {"points": 400, "answer": "The only continent without a desert.", "question": "What is Europe?"},
+        {"points": 400, "answer": "The first feature-length animated movie ever released.", "question": "What is Snow White and the Seven Dwarfs?"},
+        {"points": 400, "answer": "The sport in which you can score a 'birdie' or an 'eagle'.", "question": "What is golf?"}
+      ],
+      [
+        {"points": 600, "answer": "The name of the ship that brought the Pilgrims to America in 1620.", "question": "What is the Mayflower?"},
+        {"points": 600, "answer": "The element with the atomic number 1.", "question": "What is hydrogen?"},
+        {"points": 600, "answer": "The imaginary line at 0 degrees latitude.", "question": "What is the Equator?"},
+        {"points": 600, "answer": "The actress who played both Hermione Granger and Belle.", "question": "Who is Emma Watson?"},
+        {"points": 600, "answer": "The golfer with the most major championship wins.", "question": "Who is Jack Nicklaus?"}
+      ],
+      [
+        {"points": 800, "answer": "The ancient library that was one of the largest and most significant libraries of the ancient world, located in Egypt.", "question": "What is the Library of Alexandria?"},
+        {"points": 800, "answer": "The temperature at which water boils in Fahrenheit at sea level.", "question": "What is 212 degrees?"},
+        {"points": 800, "answer": "The number of time zones in Russia.", "question": "What is 11?"},
+        {"points": 800, "answer": "The number of Academy Awards the movie 'Titanic' won.", "question": "What is 11?"},
+        {"points": 800, "answer": "The only Grand Slam tennis tournament played on grass courts.", "question": "What is Wimbledon?"}
+      ],
+      [
+        {"points": 1000, "answer": "The treaty that ended World War I.", "question": "What is the Treaty of Versailles?"},
+        {"points": 1000, "answer": "The phenomenon where light bends as it passes through different mediums.", "question": "What is refraction?"},
+        {"points": 1000, "answer": "The deepest point in Earth's oceans, located in the Mariana Trench.", "question": "What is Challenger Deep?"},
+        {"points": 1000, "answer": "The real name of the artist known as 'The King of Pop'.", "question": "Who is Michael Jackson?"},
+        {"points": 1000, "answer": "The number of minutes in a full rugby union match.", "question": "What is 80?"}
+      ]
+    ]
+  }
+}
+
