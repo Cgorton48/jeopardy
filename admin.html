@@ -38,6 +38,37 @@
             margin-bottom: 30px;
         }
         
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .btn-back-to-game {
+            background: #48bb78;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-back-to-game:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+        
         .tabs {
             display: flex;
             border-bottom: 2px solid #ddd;
@@ -365,8 +396,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎮 Juliet Jeopardy - Admin Panel</h1>
-        <p class="subtitle">Create and manage your Jeopardy games</p>
+        <div class="header-controls">
+            <div class="header-left">
+                <h1>🎮 Juliet Jeopardy - Admin Panel</h1>
+                <p class="subtitle">Create and manage your Jeopardy games</p>
+            </div>
+            <a href="index.html" class="btn-back-to-game">
+                🎮 Back to Game
+            </a>
+        </div>
         
         <div id="alertContainer"></div>
         
