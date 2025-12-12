@@ -1,0 +1,303 @@
+{
+  "id": "mlrs_13j_game",
+  "name": "13J MLRS Jeopardy",
+  "categories": [
+    {
+      "single": "AFATDS OPERATIONS",
+      "double": "FIRE DIRECTION PROCEDURES"
+    },
+    {
+      "single": "TARGET PROCESSING",
+      "double": "METEOROLOGICAL DATA"
+    },
+    {
+      "single": "AMMUNITION AND MUNITIONS",
+      "double": "FIRE SUPPORT COORDINATION"
+    },
+    {
+      "single": "ACRONYMS AND TERMS",
+      "double": "COMMUNICATIONS"
+    },
+    {
+      "single": "SAFETY AND DANGER AREAS",
+      "double": "MISSION PLANNING AND ANALYSIS"
+    }
+  ],
+  "questions": {
+    "single": [
+      [
+        {
+          "points": 100,
+          "answer": "The standard Army system used for fire support planning and execution.",
+          "question": "What is AFATDS (Advanced Field Artillery Tactical Data System)?"
+        },
+        {
+          "points": 100,
+          "answer": "This element of the call for fire identifies the target location.",
+          "question": "What is the grid coordinate or target location?"
+        },
+        {
+          "points": 100,
+          "answer": "This six-digit code is used to uniquely identify targets in AFATDS.",
+          "question": "What is the target number or AF number?"
+        },
+        {
+          "points": 100,
+          "answer": "This data is essential for accurate fire direction and must be updated regularly.",
+          "question": "What is Met (Meteorological) data or Met message?"
+        },
+        {
+          "points": 100,
+          "answer": "This guided rocket provides precision engagement with reduced collateral damage.",
+          "question": "What is GMLRS (Guided Multiple Launch Rocket System)?"
+        }
+      ],
+      [
+        {
+          "points": 200,
+          "answer": "This AFATDS window is used to create and manage fire missions.",
+          "question": "What is the Mission Processing window?"
+        },
+        {
+          "points": 200,
+          "answer": "The FDO must compute this data to determine if a target is within range of available firing units.",
+          "question": "What is range and deflection or firing data?"
+        },
+        {
+          "points": 200,
+          "answer": "This type of target requires immediate engagement and takes precedence over all others.",
+          "question": "What is a Flash target?"
+        },
+        {
+          "points": 200,
+          "answer": "Standard Met messages are valid for this amount of time before requiring update.",
+          "question": "What is 4 hours?"
+        },
+        {
+          "points": 200,
+          "answer": "The DOT (Department of Transportation) code is used to identify this about ammunition.",
+          "question": "What is the hazard class or ammunition type?"
+        }
+      ],
+      [
+        {
+          "points": 300,
+          "answer": "This button in AFATDS is used to send a fire mission to the firing unit.",
+          "question": "What is the Commit button?"
+        },
+        {
+          "points": 300,
+          "answer": "This term describes the process of verifying fire mission data before sending to the launcher.",
+          "question": "What is technical fire direction or TFD check?"
+        },
+        {
+          "points": 300,
+          "answer": "This process involves breaking down a large target area into multiple smaller target areas for engagement.",
+          "question": "What is target subdivision or creating a group/series?"
+        },
+        {
+          "points": 300,
+          "answer": "This Met data element has the most significant impact on rocket trajectory.",
+          "question": "What is wind speed and direction or ballistic wind?"
+        },
+        {
+          "points": 300,
+          "answer": "When planning fire missions, the FDO must consider this quantity to ensure adequate supply.",
+          "question": "What is ASL (Ammunition Supply Level) or on-hand ammunition?"
+        }
+      ],
+      [
+        {
+          "points": 400,
+          "answer": "This AFATDS function allows you to determine firing unit capabilities and ammunition status.",
+          "question": "What is the Unit Status function or Resource Management?"
+        },
+        {
+          "points": 400,
+          "answer": "When multiple fire missions are received, the FDC prioritizes them using this system.",
+          "question": "What is the fire mission priority system (Flash, Immediate, Priority, Routine)?"
+        },
+        {
+          "points": 400,
+          "answer": "This AFATDS function is used to store targets for potential future engagement.",
+          "question": "What is the Target List or Planned Target function?"
+        },
+        {
+          "points": 400,
+          "answer": "The computer Met message is identified by this message type.",
+          "question": "What is METCM or Computer Met Message?"
+        },
+        {
+          "points": 400,
+          "answer": "This ATACMS variant provides extended range precision strike capability up to 300km.",
+          "question": "What is ATACMS or M57?"
+        }
+      ],
+      [
+        {
+          "points": 500,
+          "answer": "This process in AFATDS automatically selects the best firing unit based on criteria like range, ammunition, and priority.",
+          "question": "What is Unit Selection Logic (USL) or Automated Unit Selection?"
+        },
+        {
+          "points": 500,
+          "answer": "This calculation determines the time of flight from launcher to target.",
+          "question": "What is TOF (Time of Flight)?"
+        },
+        {
+          "points": 500,
+          "answer": "This targeting method uses pre-planned coordinates and engagement criteria for rapid response.",
+          "question": "What is Scheduled Target or Time on Target (TOT)?"
+        },
+        {
+          "points": 500,
+          "answer": "This altitude reference is used as the starting point for Met data computation.",
+          "question": "What is the firing unit altitude or gun altitude?"
+        },
+        {
+          "points": 500,
+          "answer": "This term describes the minimum distance from friendly forces when employing submunition warheads.",
+          "question": "What is the CDE (Collateral Damage Estimate) or danger close distance?"
+        }
+      ]
+    ],
+    "double": [
+      [
+        {
+          "points": 200,
+          "answer": "This graphic control measure defines the boundary where fires must be coordinated.",
+          "question": "What is the FSCMs (Fire Support Coordination Measures) or CFL (Coordinated Fire Line)?"
+        },
+        {
+          "points": 200,
+          "answer": "FDC stands for this element that processes fire missions.",
+          "question": "What is Fire Direction Center?"
+        },
+        {
+          "points": 200,
+          "answer": "This radio system is the primary means of communication between the FDC and firing units.",
+          "question": "What is SINCGARS or tactical radio?"
+        },
+        {
+          "points": 200,
+          "answer": "This is the minimum safe distance from the target when engaging with MLRS.",
+          "question": "What is danger close (depends on munition type)?"
+        },
+        {
+          "points": 200,
+          "answer": "This process involves selecting the appropriate munition based on target type and desired effects.",
+          "question": "What is munition selection or effects-based targeting?"
+        }
+      ],
+      [
+        {
+          "points": 400,
+          "answer": "This measure prohibits fires without approval from the establishing headquarters.",
+          "question": "What is the RFL (Restrictive Fire Line) or No Fire Area (NFA)?"
+        },
+        {
+          "points": 400,
+          "answer": "MLRS stands for this rocket artillery system.",
+          "question": "What is Multiple Launch Rocket System?"
+        },
+        {
+          "points": 400,
+          "answer": "This digital message format is used to transmit fire missions from AFATDS to the launcher.",
+          "question": "What is LNFM (Launcher Fire Message) or digital fire mission?"
+        },
+        {
+          "points": 400,
+          "answer": "The FDO must verify that the target is not within this many meters of friendly forces for submunitions.",
+          "question": "What is 600 meters minimum (varies by munition)?"
+        },
+        {
+          "points": 400,
+          "answer": "The FDO uses this method to determine how many rockets are needed to achieve target effects.",
+          "question": "What is munitions expenditure calculation or sheaf planning?"
+        }
+      ],
+      [
+        {
+          "points": 600,
+          "answer": "Before engaging targets in this area, the FDO must obtain clearance from the establishing commander.",
+          "question": "What is a Restricted Fire Area (RFA)?"
+        },
+        {
+          "points": 600,
+          "answer": "TLE stands for this measure of target location accuracy.",
+          "question": "What is Target Location Error?"
+        },
+        {
+          "points": 600,
+          "answer": "When radio communications fail, the FDC uses this backup method to transmit fire missions.",
+          "question": "What is wire/landline or messenger?"
+        },
+        {
+          "points": 600,
+          "answer": "This safety check ensures that the rocket trajectory will not overfly friendly positions.",
+          "question": "What is trajectory analysis or crest clearance check?"
+        },
+        {
+          "points": 600,
+          "answer": "This term describes adjusting subsequent rounds based on observed impact of initial rounds.",
+          "question": "What is adjustment fire or fire refinement?"
+        }
+      ],
+      [
+        {
+          "points": 800,
+          "answer": "This coordination measure is used to protect friendly aircraft and requires altitude deconfliction.",
+          "question": "What is the FSCM altitude or Airspace Coordinating Altitude (ACA)?"
+        },
+        {
+          "points": 800,
+          "answer": "ATO stands for this document that coordinates airspace usage.",
+          "question": "What is Air Tasking Order?"
+        },
+        {
+          "points": 800,
+          "answer": "This report is sent from the firing unit to the FDC after completing a fire mission.",
+          "question": "What is a Rounds Complete or Mission Complete report?"
+        },
+        {
+          "points": 800,
+          "answer": "Before clearing a fire mission, the FDO must check this graphic to ensure no friendly positions are in the blast area.",
+          "question": "What is the Common Operational Picture (COP) or friendly trace?"
+        },
+        {
+          "points": 800,
+          "answer": "This AFATDS function allows the FDO to simulate fire missions before execution.",
+          "question": "What is the Rehearsal function or What-If analysis?"
+        }
+      ],
+      [
+        {
+          "points": 1000,
+          "answer": "This process ensures that fires do not adversely affect friendly forces, civilians, or protected areas.",
+          "question": "What is CDE (Collateral Damage Estimate) or clearance of fires?"
+        },
+        {
+          "points": 1000,
+          "answer": "FASCAM stands for this type of rapidly emplaced minefield.",
+          "question": "What is Family of Scatterable Mines?"
+        },
+        {
+          "points": 1000,
+          "answer": "This system provides position location information for navigation and targeting.",
+          "question": "What is GPS (Global Positioning System) or PLGR/DAGR?"
+        },
+        {
+          "points": 1000,
+          "answer": "This calculation determines the surface danger zone and impact area for the mission.",
+          "question": "What is the SDZ (Surface Danger Zone) computation or impact area analysis?"
+        },
+        {
+          "points": 1000,
+          "answer": "When planning a TOT (Time on Target) mission, the FDO must calculate this for each firing unit.",
+          "question": "What is the firing window or time to fire?"
+        }
+      ]
+    ]
+  },
+  "lastModified": "2025-12-12T20:15:00.000Z"
+}

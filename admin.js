@@ -43,6 +43,7 @@ $(document).ready(function() {
     $('#fileInput').change(handleFileSelect);
     $('#loadDefaultGame').click(loadDefaultGameTemplate);
     $('#loadGeneralTrivia').click(loadGeneralTriviaTemplate);
+    $('#loadMLRSGame').click(loadMLRSGameTemplate);
     $('#loadBlankGame').click(loadBlankTemplate);
     
     // Drag and drop
@@ -414,6 +415,23 @@ function loadGeneralTriviaTemplate() {
         })
         .catch(err => {
             showAlert('Error loading general trivia game: ' + err.message, 'error');
+        });
+}
+
+// Load MLRS 13J game template
+function loadMLRSGameTemplate() {
+    fetch('games/mlrs-13j-game.json')
+        .then(response => response.json())
+        .then(data => {
+            delete data.id; // Remove ID to create new game
+            data.name = "13J MLRS Jeopardy (Copy)";
+            const gameId = gameManager.importGame(data);
+            loadGamesList();
+            populateExportSelect();
+            showAlert('13J MLRS game imported!', 'success');
+        })
+        .catch(err => {
+            showAlert('Error loading MLRS game: ' + err.message, 'error');
         });
 }
 
